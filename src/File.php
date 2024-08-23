@@ -17,7 +17,7 @@ class File
      */
     public static function close(mixed $stream): void
     {
-        fclose($stream);
+        Error::watch('fclose', $stream);
     }
 
     /**

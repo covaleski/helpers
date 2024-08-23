@@ -145,13 +145,27 @@ final class FileTest extends TestCase
     }
 
     /**
-     * Test if throws exceptions on failure.
+     * Test if throws exceptions when fails to open files.
      */
     #[DataProvider('invalidFilenameProvider')]
-    public function testPanicsOnFailure(array $args, string $expected): void
+    public function testPanicsIfCannotOpen(array $args, string $expected): void
     {
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessage($expected);
         File::open(...$args);
+    }
+
+    /**
+     * Test if throws exceptions when fails to close pointers.
+     */
+    public function testPanicsIfCannotClose(): void
+    {
+        $filename = 'data:text/plain,Hello!';
+        $pointer = File::open($filename, FileMode::READ_IF_EXISTS);
+        File::close($pointer);
+        $this->expectException(ErrorException::class);
+        $text = 'fclose(): supplied resource is not a valid stream resource';
+        $this->expectExceptionMessage($text);
+        File::close($pointer);
     }
 }
