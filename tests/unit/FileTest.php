@@ -6,6 +6,7 @@ namespace Tests\Unit;
 
 use Covaleski\Helpers\Enums\FileMode;
 use Covaleski\Helpers\File;
+use ErrorException;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,7 @@ use RuntimeException;
  */
 #[CoversMethod(File::class, 'close')]
 #[CoversMethod(File::class, 'open')]
+#[CoversMethod(File::class, 'handleError')]
 final class FileTest extends TestCase
 {
     /**
@@ -26,7 +28,7 @@ final class FileTest extends TestCase
         return [
             'inexistent file' => [
                 [
-                    $filename = (function () {
+                    (function () {
                         $filename = static::createTemporaryFile();
                         unlink($filename);
                         return $filename;
@@ -34,6 +36,20 @@ final class FileTest extends TestCase
                     FileMode::READ_IF_EXISTS,
                 ],
                 'Failed to open stream: No such file or directory',
+            ],
+            'existent file' => [
+                [
+                    static::createTemporaryFile(),
+                    FileMode::READ_WRITE_IF_NOT_EXISTS,
+                ],
+                'Failed to open stream: File exists',
+            ],
+            'invalid filename' => [
+                [
+                    'data:foobar',
+                    FileMode::READ_IF_EXISTS,
+                ],
+                'Failed to open stream: rfc2397: no comma in URL',
             ],
         ];
     }
@@ -131,7 +147,7 @@ final class FileTest extends TestCase
     #[DataProvider('invalidFilenameProvider')]
     public function testPanicsOnFailure(array $args, string $expected): void
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(ErrorException::class);
         $this->expectExceptionMessage($expected);
         File::open(...$args);
     }

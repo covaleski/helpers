@@ -3,8 +3,7 @@
 namespace Covaleski\Helpers;
 
 use Covaleski\Helpers\Enums\FileMode;
-use RuntimeException;
-use Throwable;
+use ErrorException;
 
 /**
  * Provides helper methods to handle files.
@@ -25,19 +24,33 @@ class File
      * Open a file.
      * 
      * @return resource
-     * @throws RuntimeException If cannot open the file.
+     * @throws ErrorException If cannot open the file.
      */
     public static function open(
         string $filename,
         FileMode $mode,
         mixed $context = null,
     ): mixed {
-        set_error_handler(function (int $errno, string $errstr) {
+        set_error_handler([static::class, 'handleError']);
+        try {
+            $stream = fopen($filename, $mode->value, false, $context);
+            return $stream;
+        } catch (ErrorException $exception) {
+            throw $exception;
+        } finally {
             restore_error_handler();
-            throw new RuntimeException($errstr, $errno);
-        });
-        $stream = fopen($filename, $mode->value, false, $context);
-        restore_error_handler();
-        return $stream;
+        }
+    }
+
+    /**
+     * Handle an error.
+     */
+    protected static function handleError(
+        int $code,
+        string $message,
+        string $filename,
+        int $line,
+    ): void {
+        throw new ErrorException($message, $code, 1, $filename, $line);
     }
 }
