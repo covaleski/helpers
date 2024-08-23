@@ -31,26 +31,6 @@ class File
         FileMode $mode,
         mixed $context = null,
     ): mixed {
-        set_error_handler([static::class, 'handleError']);
-        try {
-            $stream = fopen($filename, $mode->value, false, $context);
-            return $stream;
-        } catch (ErrorException $exception) {
-            throw $exception;
-        } finally {
-            restore_error_handler();
-        }
-    }
-
-    /**
-     * Handle an error.
-     */
-    protected static function handleError(
-        int $code,
-        string $message,
-        string $filename,
-        int $line,
-    ): void {
-        throw new ErrorException($message, $code, 1, $filename, $line);
+        return Error::watch('fopen', $filename, $mode->value, false, $context);
     }
 }

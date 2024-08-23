@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use Covaleski\Helpers\Enums\FileMode;
+use Covaleski\Helpers\Error;
 use Covaleski\Helpers\File;
 use ErrorException;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesMethod;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -17,7 +19,8 @@ use RuntimeException;
  */
 #[CoversMethod(File::class, 'close')]
 #[CoversMethod(File::class, 'open')]
-#[CoversMethod(File::class, 'handleError')]
+#[UsesMethod(Error::class, 'escalate')]
+#[UsesMethod(Error::class, 'watch')]
 final class FileTest extends TestCase
 {
     /**
