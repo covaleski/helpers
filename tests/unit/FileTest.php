@@ -189,15 +189,4 @@ final class FileTest extends TestCase
         $this->expectExceptionMessage($text);
         File::close($pointer);
     }
-
-    /**
-     * Test if can validate pointers.
-     */
-    #[DataProvider('pointerProvider')]
-    public function testValidatesPointers(mixed $resource): void
-    {
-        $this->assertFalse(File::isClosed($resource));
-        fclose($resource);
-        $this->assertTrue(File::isClosed($resource));
-    }
 }

@@ -24,16 +24,6 @@ class File
     }
 
     /**
-     * Check whether the resource is closed.
-     * 
-     * @param resource $resource
-     */
-    public static function isClosed(mixed $resource): bool
-    {
-        return gettype($resource) === 'resource (closed)';
-    }
-
-    /**
      * Open a file.
      * 
      * @return resource
