@@ -4,6 +4,7 @@ namespace Covaleski\Helpers;
 
 use Covaleski\Helpers\Enums\FileMode;
 use ErrorException;
+use InvalidArgumentException;
 
 /**
  * Provides helper methods to handle files.
@@ -20,6 +21,16 @@ class File
     public static function close(mixed $stream): void
     {
         Error::watch('fclose', $stream);
+    }
+
+    /**
+     * Check whether the resource is closed.
+     * 
+     * @param resource $resource
+     */
+    public static function isClosed(mixed $resource): bool
+    {
+        return gettype($resource) === 'resource (closed)';
     }
 
     /**

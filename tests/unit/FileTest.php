@@ -8,6 +8,7 @@ use Covaleski\Helpers\Enums\FileMode;
 use Covaleski\Helpers\Error;
 use Covaleski\Helpers\File;
 use ErrorException;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesMethod;
@@ -18,6 +19,7 @@ use RuntimeException;
  * @coversDefaultClass \Covaleski\Helpers\File
  */
 #[CoversMethod(File::class, 'close')]
+#[CoversMethod(File::class, 'isClosed')]
 #[CoversMethod(File::class, 'open')]
 #[UsesMethod(Error::class, 'escalate')]
 #[UsesMethod(Error::class, 'watch')]
@@ -53,6 +55,25 @@ final class FileTest extends TestCase
                     FileMode::READ_IF_EXISTS,
                 ],
                 'Failed to open stream: rfc2397: no comma in URL',
+            ],
+        ];
+    }
+
+    /**
+     * Provides open file pointers.
+     */
+    public static function pointerProvider(): array
+    {
+        return [
+            'temporary file' => [
+                (function () {
+                    return fopen(static::createTemporaryFile('Hello!'), 'r');
+                })(),
+            ],
+            'empty temporary file' => [
+                (function () {
+                    return fopen(static::createTemporaryFile(''), 'r');
+                })(),
             ],
         ];
     }
@@ -167,5 +188,16 @@ final class FileTest extends TestCase
         $text = 'fclose(): supplied resource is not a valid stream resource';
         $this->expectExceptionMessage($text);
         File::close($pointer);
+    }
+
+    /**
+     * Test if can validate pointers.
+     */
+    #[DataProvider('pointerProvider')]
+    public function testValidatesPointers(mixed $resource): void
+    {
+        $this->assertFalse(File::isClosed($resource));
+        fclose($resource);
+        $this->assertTrue(File::isClosed($resource));
     }
 }
