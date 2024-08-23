@@ -7,6 +7,8 @@ use ErrorException;
 
 /**
  * Provides helper methods to handle files.
+ * 
+ * Automatically sets error handlers to catch warnings and ensure return types.
  */
 class File
 {
