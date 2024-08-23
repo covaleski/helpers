@@ -2,7 +2,9 @@
 
 namespace Covaleski\Helpers;
 
+use Error as PhpError;
 use ErrorException;
+use RuntimeException;
 
 /**
  * Provides helper methods to handle PHP errors.
@@ -33,6 +35,14 @@ class Error
         set_error_handler([static::class, 'escalate']);
         try {
             return call_user_func_array($callback, $arguments);
+        } catch (PhpError $error) {
+            throw new ErrorException(
+                code: $error->getCode(),
+                message: $error->getMessage(),
+                filename: $error->getFile(),
+                line: $error->getLine(),
+                previous: $error,
+            );
         } finally {
             restore_error_handler();
         }

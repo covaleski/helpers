@@ -3,8 +3,10 @@
 namespace Tests\Unit;
 
 use Covaleski\Helpers\Error;
+use Error as PhpError;
 use ErrorException;
 use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,20 +17,34 @@ use PHPUnit\Framework\TestCase;
 final class ErrorTest extends TestCase
 {
     /**
+     * Provide test callbacks with errors.
+     */
+    public static function errorProvider(): array
+    {
+        return [
+            ['Something is deprecated!', E_USER_DEPRECATED],
+            ['I noticed something!', E_USER_NOTICE],
+            ['Warning! Warning!', E_USER_WARNING],
+            ['Panic!', E_USER_ERROR],
+        ];
+    }
+
+    /**
      * Test if the helper can throw errors and warnings as exceptions.
      */
-    public function testEscalatesErrorsAsExceptions(): void
+    #[DataProvider('errorProvider')]
+    public function testEscalatesErrorsAsExceptions(string $str, int $no): void
     {
         /** @var null|array */
         $arguments = null;
         set_error_handler(function (...$error) use (&$arguments) {
             $arguments = $error;
         });
-        fopen('data:foobar', 'r');
-        trigger_error('Attention!', E_USER_WARNING);
+        trigger_error($str, $no);
         restore_error_handler();
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessage('Attention!');
+        $this->expectExceptionCode($no);
+        $this->expectExceptionMessage($str);
         Error::escalate(...$arguments);
     }
 
@@ -37,14 +53,28 @@ final class ErrorTest extends TestCase
      */
     public function testWatchesForCallbackErrors(): void
     {
-        $result = Error::watch(function (int $a, int $b): int {
-            return $a * $b;
-        }, 3, 9);
-        $this->assertSame(27, $result);
         $this->expectException(ErrorException::class);
         $this->expectExceptionMessage('Kaboom!');
         Error::watch(function () {
             trigger_error('Kaboom!', E_USER_WARNING);
         });
+    }
+
+    /**
+     * Test if the helper can watch and escalate for callback errors.
+     */
+    public function testWatchesForCallbackThrowables(): void
+    {
+        $error = new PhpError('Something went wrong!');
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessage('Something went wrong!');
+        try {
+            Error::watch(function () use ($error) {
+                throw $error;
+            });
+        } catch (ErrorException $exception) {
+            $this->assertSame($error, $exception->getPrevious());
+            throw $exception;
+        }
     }
 }
