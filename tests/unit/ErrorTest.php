@@ -17,7 +17,26 @@ use PHPUnit\Framework\TestCase;
 final class ErrorTest extends TestCase
 {
     /**
-     * Provide test callbacks with errors.
+     * Provide test callbacks to watch.
+     */
+    public static function callbackProvider(): array
+    {
+        return [
+            [
+                'Hello, John!',
+                fn (string $name): string => "Hello, {$name}!",
+                ['John'],
+            ],
+            [
+                'Result: 27',
+                fn (int $a, int $b): string => 'Result: ' . strval($a * $b),
+                [3, 9],
+            ]
+        ];
+    }
+
+    /**
+     * Provide test error parameters.
      */
     public static function errorProvider(): array
     {
@@ -46,6 +65,18 @@ final class ErrorTest extends TestCase
         $this->expectExceptionCode($no);
         $this->expectExceptionMessage($str);
         Error::escalate(...$arguments);
+    }
+
+    /**
+     * Test if the helper uses provided arguments and returns callback results.
+     */
+    #[DataProvider('callbackProvider')]
+    public function testRunsCallbacks(
+        mixed $expected,
+        callable $callback,
+        array $arguments,
+    ): void {
+        $this->assertSame($expected, Error::watch($callback, ...$arguments));
     }
 
     /**
