@@ -4,7 +4,6 @@ namespace Covaleski\Helpers;
 
 use Error as PhpError;
 use ErrorException;
-use RuntimeException;
 
 /**
  * Provides helper methods to handle PHP errors.
@@ -19,7 +18,7 @@ class Error
         string $message,
         string $filename,
         int $line,
-    ) : void {
+    ): void {
         throw new ErrorException($message, $code, 1, $filename, $line);
     }
 
