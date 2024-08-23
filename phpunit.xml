@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd" beStrictAboutTestsThatDoNotTestAnything="true" bootstrap="tests/bootstrap.php" failOnEmptyTestSuite="true" failOnIncomplete="true" failOnRisky="true" failOnSkipped="true" failOnWarning="true" stopOnFailure="true" testdox="true" cacheDirectory=".phpunit.cache" requireCoverageMetadata="true" beStrictAboutCoverageMetadata="true">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd" beStrictAboutTestsThatDoNotTestAnything="true" bootstrap="tests/bootstrap.php" failOnDeprecation="true" failOnEmptyTestSuite="true" failOnIncomplete="true" failOnRisky="true" failOnSkipped="true" failOnWarning="true" stopOnFailure="true" testdox="true" cacheDirectory=".phpunit.cache" requireCoverageMetadata="true" beStrictAboutCoverageMetadata="true">
   <coverage>
     <report>
       <text outputFile=".phpunit.coverage.text"/>
@@ -14,10 +14,5 @@
     <include>
       <directory suffix=".php">src</directory>
     </include>
-    <exclude>
-      <directory suffix=".php">src/Language</directory>
-      <directory suffix=".php">src/Views</directory>
-      <directory suffix=".php">src/WebRoot</directory>
-    </exclude>
   </source>
 </phpunit>
