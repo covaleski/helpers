@@ -1,0 +1,22 @@
+{
+    "name": "covaleski/helpers",
+    "description": "Static methods I like to use in personal projects.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Covaleski\\Helpers\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Rafael Covaleski Pereira",
+            "email": "rafael.covaleski@laucov.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require-dev": {
+        "phpunit/phpunit": "^11.3",
+        "laravel/pint": "^1.17"
+    }
+}

@@ -1,0 +1,14 @@
+# ----------------
+# Composer
+# ----------------
+
+/vendor/
+
+# ----------------
+# Tests
+# ----------------
+
+.phpunit.coverage.*
+.phpunit.result.cache
+phpunit.xml.bak
+/.phpunit.cache/
