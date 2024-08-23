@@ -4,4 +4,10 @@ Static methods I like to use in personal projects.
 
 ## Tasks
 
-- [ ] Test and upload local libraries.
+- [ ] Methods:
+  - [ ] `File::isClosed(resource $resource): bool`;
+- [ ] Test and upload personal helpers:
+  - [ ] `Internet`;
+  - [ ] `Request`;
+  - [ ] `Response`;
+  - [ ] `System`.
