@@ -8,7 +8,6 @@ use Covaleski\Helpers\Enums\FileMode;
 use Covaleski\Helpers\Error;
 use Covaleski\Helpers\File;
 use ErrorException;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesMethod;
@@ -19,7 +18,6 @@ use RuntimeException;
  * @coversDefaultClass \Covaleski\Helpers\File
  */
 #[CoversMethod(File::class, 'close')]
-#[CoversMethod(File::class, 'isClosed')]
 #[CoversMethod(File::class, 'open')]
 #[UsesMethod(Error::class, 'escalate')]
 #[UsesMethod(Error::class, 'watch')]
