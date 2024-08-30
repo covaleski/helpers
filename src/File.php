@@ -18,9 +18,11 @@ class File
      * @param resource $resource Resource to close.
      * @throws ErrorException If cannot close the stream.
      */
-    public static function close(mixed $stream): void
+    public static function close(mixed $resource): void
     {
-        Error::watch('fclose', $stream);
+        Error::watch(function () use ($resource) {
+            fclose($resource);
+        });
     }
 
     /**
@@ -36,6 +38,8 @@ class File
         FileMode $mode,
         mixed $context = null,
     ): mixed {
-        return Error::watch('fopen', $filename, $mode->value, false, $context);
+        return Error::watch(function () use ($filename, $mode, $context) {
+            return fopen($filename, $mode->value, false, $context);
+        });
     }
 }
