@@ -30,6 +30,7 @@ class File
      * 
      * @param string $filename Filename to open.
      * @param FileMode $mode File mode to use.
+     * @param null|resource $context Context stream resource.
      * @return resource File pointer.
      * @throws ErrorException If cannot open the file.
      */
@@ -43,6 +44,16 @@ class File
         });
     }
 
+    /**
+     * Read the contents of a file from a resource or filename.
+     * 
+     * @param string|resource $file Filename or resource.
+     * @param null|resource $context Context stream resource.
+     * @param int $offset Amount of bytes to ignore.
+     * @param null|int $length Amount of bytes to read.
+     * @return string Read data.
+     * @throws ErrorException If cannot read the filename or resource.
+     */
     public static function read(
         mixed $file,
         mixed $context,
