@@ -49,10 +49,19 @@ class File
         int $offset = 0,
         null|int $length = null,
     ): string {
-        if (is_string($file)) {
-            return file_get_contents($file, false, $context, $offset, $length);
-        } else {
-            return stream_get_contents($file, $length, $offset);
-        }
+        return Error::watch(
+            function () use ($file, $context, $offset, $length) {
+                if (is_string($file)) {
+                    return file_get_contents(
+                        filename: $file,
+                        use_include_path: false,
+                        context: $context,
+                        offset: $offset,
+                        length: $length);
+                } else {
+                    return stream_get_contents($file, $length, $offset);
+                }
+            },
+        );
     }
 }

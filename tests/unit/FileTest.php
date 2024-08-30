@@ -59,6 +59,54 @@ final class FileTest extends TestCase
     }
 
     /**
+     * Provides reading parameters and filenames or pointers that must fail.
+     */
+    public static function invalidReadingProvider(): array
+    {
+        return [
+            'closed resource' => [
+                [
+                    (function () {
+                        $filename = static::createTemporaryFile('Hey, ho!');
+                        $pointer = fopen($filename, 'r');
+                        fclose($pointer);
+                        return $pointer;
+                    })(),
+                    null,
+                    5,
+                    2,
+                ],
+                'stream_get_contents(): supplied resource is not a valid '
+                    . 'stream resource',
+            ],
+            'data URI invalid fseek' => [
+                [
+                    'data:text/plain,Do not seek me to far!',
+                    null,
+                    381279,
+                    10,
+                ],
+                'file_get_contents(): Failed to seek to position 381279 in '
+                    . 'the stream',
+            ],
+            'write-only pointer' => [
+                [
+                    (function () {
+                        $filename = static::createTemporaryFile('{foo:"bar"}');
+                        $pointer = fopen($filename, 'c');
+                        return $pointer;
+                    })(),
+                    null,
+                    5,
+                    5,
+                ],
+                'stream_get_contents(): Read of 8192 bytes failed with '
+                    . 'errno=9 Bad file descriptor',
+            ],
+        ];
+    }
+
+    /**
      * This method is called after the last test of this test class is run.
      */
     public static function tearDownAfterClass(): void
@@ -231,6 +279,17 @@ final class FileTest extends TestCase
         $text = 'fclose(): supplied resource is not a valid stream resource';
         $this->expectExceptionMessage($text);
         File::close($pointer);
+    }
+
+    /**
+     * Test if throws exceptions when fails to read files.
+     */
+    #[DataProvider('invalidReadingProvider')]
+    public function testPanicsIfCannotRead(array $args, string $expected): void
+    {
+        $this->expectException(ErrorException::class);
+        $this->expectExceptionMessage($expected);
+        File::read(...$args);
     }
 
     /**
