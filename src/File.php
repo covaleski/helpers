@@ -42,4 +42,17 @@ class File
             return fopen($filename, $mode->value, false, $context);
         });
     }
+
+    public static function read(
+        mixed $file,
+        mixed $context,
+        int $offset = 0,
+        null|int $length = null,
+    ): string {
+        if (is_string($file)) {
+            return file_get_contents($file, false, $context, $offset, $length);
+        } else {
+            return stream_get_contents($file, $length, $offset);
+        }
+    }
 }

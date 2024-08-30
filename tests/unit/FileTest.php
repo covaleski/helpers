@@ -18,6 +18,7 @@ use RuntimeException;
  * @coversDefaultClass \Covaleski\Helpers\File
  */
 #[CoversMethod(File::class, 'close')]
+#[CoversMethod(File::class, 'read')]
 #[CoversMethod(File::class, 'open')]
 #[UsesMethod(Error::class, 'escalate')]
 #[UsesMethod(Error::class, 'watch')]
@@ -67,6 +68,69 @@ final class FileTest extends TestCase
                 unlink($filename);
             }
         }
+    }
+
+    /**
+     * Provides readable file pointers and associated expectations.
+     */
+    public static function validReadingProvider(): array
+    {
+        $create = function (string $content) {
+            return fopen(static::createTemporaryFile($content), 'r');
+        };
+
+        return [
+            'temporary resource' => [
+                [
+                    $create('The quick brown fox jumps over the lazy dog.'),
+                    null,
+                ],
+                [
+                    [35, 8, 'lazy dog'],
+                    [4, 15, 'quick brown fox'],
+                    [85471, 1451, ''],
+                ],
+            ],
+            'temporary filename' => [
+                [
+                    static::createTemporaryFile('Hello, World!'),
+                    null,
+                ],
+                [
+                    [0, null, 'Hello, World!'],
+                    [0, 5, 'Hello'],
+                    [7, 5, 'World'],
+                    [12, null, '!'],
+                    [0, 999, 'Hello, World!'],
+                    [9999999, 2, ''],
+                ],
+            ],
+            'data URI filename' => [
+                [
+                    'data:text/plain,Fusce in risus neque.',
+                    null,
+                ],
+                [
+                    [0, null, 'Fusce in risus neque.'],
+                    [15, null, 'neque.'],
+                    [6, 8, 'in risus'],
+                    [15, 789451, 'neque.'],
+                ],
+            ],
+            'data URI resource' => [
+                [
+                    fopen('data:text/plain,Maecenas quis dictum nisi.', 'r'),
+                    null,
+                ],
+                [
+                    [25, 9898745, '.'],
+                    [0, 8, 'Maecenas'],
+                    [9, 11, 'quis dictum'],
+                    [0, 25, 'Maecenas quis dictum nisi'],
+                    [0, null, 'Maecenas quis dictum nisi.'],
+                ]
+            ],
+        ];
     }
 
     /**
@@ -167,5 +231,24 @@ final class FileTest extends TestCase
         $text = 'fclose(): supplied resource is not a valid stream resource';
         $this->expectExceptionMessage($text);
         File::close($pointer);
+    }
+
+    /**
+     * Test if the helper can read files properly.
+     */
+    #[DataProvider('validReadingProvider')]
+    public function testReadsFiles(array $arguments, array $tests): void
+    {
+        [$file, $context] = $arguments;
+        foreach ($tests as [$offset, $length, $expected]) {
+            $actual = File::read($file, $context, $offset, $length);
+            $offset = var_export($offset, true);
+            $length = var_export($length, true);
+            $this->assertSame($expected, $actual, <<<TXT
+                Assert read file contents.
+                Offset: {$offset}
+                Length: {$length}
+                TXT);
+        }
     }
 }
