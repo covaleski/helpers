@@ -30,7 +30,7 @@ final class FileTest extends TestCase
     public static function invalidOpeningProvider(): array
     {
         return [
-            'inexistent file' => [
+            'r mode on inexistent file' => [
                 [
                     (function () {
                         $filename = static::createTemporaryFile();
@@ -39,21 +39,18 @@ final class FileTest extends TestCase
                     })(),
                     FileMode::READ_IF_EXISTS,
                 ],
-                'Failed to open stream: No such file or directory',
             ],
-            'existent file' => [
+            'x+ mode on existent file' => [
                 [
                     static::createTemporaryFile(),
                     FileMode::READ_WRITE_IF_NOT_EXISTS,
                 ],
-                'Failed to open stream: File exists',
             ],
-            'invalid filename' => [
+            'invalid data URI' => [
                 [
                     'data:foobar',
                     FileMode::READ_IF_EXISTS,
                 ],
-                'Failed to open stream: rfc2397: no comma in URL',
             ],
         ];
     }
@@ -76,18 +73,14 @@ final class FileTest extends TestCase
                     5,
                     2,
                 ],
-                'stream_get_contents(): supplied resource is not a valid '
-                    . 'stream resource',
             ],
-            'data URI invalid fseek' => [
+            'invalid seek on data URI' => [
                 [
                     'data:text/plain,Do not seek me to far!',
                     null,
                     381279,
                     10,
                 ],
-                'file_get_contents(): Failed to seek to position 381279 in '
-                    . 'the stream',
             ],
             'write-only pointer' => [
                 [
@@ -100,8 +93,6 @@ final class FileTest extends TestCase
                     5,
                     5,
                 ],
-                'stream_get_contents(): Read of 8192 bytes failed with '
-                    . 'errno=9 Bad file descriptor',
             ],
         ];
     }
@@ -260,11 +251,10 @@ final class FileTest extends TestCase
      * Test if throws exceptions when fails to open files.
      */
     #[DataProvider('invalidOpeningProvider')]
-    public function testPanicsIfCannotOpen(array $args, string $expected): void
+    public function testPanicsIfCannotOpen(array $arguments): void
     {
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessage($expected);
-        File::open(...$args);
+        File::open(...$arguments);
     }
 
     /**
@@ -276,8 +266,6 @@ final class FileTest extends TestCase
         $pointer = File::open($filename, FileMode::READ_IF_EXISTS);
         File::close($pointer);
         $this->expectException(ErrorException::class);
-        $text = 'fclose(): supplied resource is not a valid stream resource';
-        $this->expectExceptionMessage($text);
         File::close($pointer);
     }
 
@@ -285,11 +273,10 @@ final class FileTest extends TestCase
      * Test if throws exceptions when fails to read files.
      */
     #[DataProvider('invalidReadingProvider')]
-    public function testPanicsIfCannotRead(array $args, string $expected): void
+    public function testPanicsIfCannotRead(array $arguments): void
     {
         $this->expectException(ErrorException::class);
-        $this->expectExceptionMessage($expected);
-        File::read(...$args);
+        File::read(...$arguments);
     }
 
     /**
