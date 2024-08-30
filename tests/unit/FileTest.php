@@ -24,9 +24,9 @@ use RuntimeException;
 final class FileTest extends TestCase
 {
     /**
-     * Provides invalid temporary filenames and expected exception messages.
+     * Provides invalid filenames to open and associated error expectations.
      */
-    public static function invalidFilenameProvider(): array
+    public static function invalidOpeningProvider(): array
     {
         return [
             'inexistent file' => [
@@ -58,25 +58,6 @@ final class FileTest extends TestCase
     }
 
     /**
-     * Provides open file pointers.
-     */
-    public static function pointerProvider(): array
-    {
-        return [
-            'temporary file' => [
-                (function () {
-                    return fopen(static::createTemporaryFile('Hello!'), 'r');
-                })(),
-            ],
-            'empty temporary file' => [
-                (function () {
-                    return fopen(static::createTemporaryFile(''), 'r');
-                })(),
-            ],
-        ];
-    }
-
-    /**
      * This method is called after the last test of this test class is run.
      */
     public static function tearDownAfterClass(): void
@@ -89,9 +70,9 @@ final class FileTest extends TestCase
     }
 
     /**
-     * Provides valid temporary filenames and associated expectations.
+     * Provides valid filenames to open and associated expectations.
      */
-    public static function validFilenameProvider(): array
+    public static function validOpeningProvider(): array
     {
         return [
             'empty file' => [
@@ -148,7 +129,7 @@ final class FileTest extends TestCase
     /**
      * Test if the helper can open and close files properly.
      */
-    #[DataProvider('validFilenameProvider')]
+    #[DataProvider('validOpeningProvider')]
     public function testOpensAndClosesFiles(array $args, array $expected): void
     {
         $pointer = File::open(...$args);
@@ -166,7 +147,7 @@ final class FileTest extends TestCase
     /**
      * Test if throws exceptions when fails to open files.
      */
-    #[DataProvider('invalidFilenameProvider')]
+    #[DataProvider('invalidOpeningProvider')]
     public function testPanicsIfCannotOpen(array $args, string $expected): void
     {
         $this->expectException(ErrorException::class);
