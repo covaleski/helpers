@@ -4,7 +4,6 @@ namespace Covaleski\Helpers;
 
 use Covaleski\Helpers\Enums\FileMode;
 use ErrorException;
-use InvalidArgumentException;
 
 /**
  * Provides helper methods to handle files.
@@ -14,9 +13,10 @@ use InvalidArgumentException;
 class File
 {
     /**
-     * Close a file.
+     * Close a resource.
      * 
-     * @param resource $resource
+     * @param resource $resource Resource to close.
+     * @throws ErrorException If cannot close the stream.
      */
     public static function close(mixed $stream): void
     {
@@ -26,7 +26,9 @@ class File
     /**
      * Open a file.
      * 
-     * @return resource
+     * @param string $filename Filename to open.
+     * @param FileMode $mode File mode to use.
+     * @return resource File pointer.
      * @throws ErrorException If cannot open the file.
      */
     public static function open(

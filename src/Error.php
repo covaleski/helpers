@@ -12,6 +12,12 @@ class Error
 {
     /**
      * Throw an `ErrorException` from error data.
+     * 
+     * @param int $code Error code.
+     * @param string $message Error message.
+     * @param string $filename Filename where the error was triggered.
+     * @param int $line File line where the error was triggered.
+     * @throws ErrorException Always (contains the provided error data).
      */
     public static function escalate(
         int $code,
@@ -26,8 +32,11 @@ class Error
      * Execute a function and escalate any thrown errors.
      * 
      * @template T
-     * @param (callable(): T) $callback
-     * @return T
+     * @param (callable(): T) $callback Function to call.
+     * @param mixed ...$arguments Arguments to use with the callback.
+     * @return T Value returned by the function if successfully executed.
+     * @throws ErrorException If a warning/deprecation/error is triggered.
+     * @throws ErrorException If an `Error` is thrown.
      */
     public static function watch(callable $callback, ...$arguments): mixed
     {
