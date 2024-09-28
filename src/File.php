@@ -3,6 +3,7 @@
 namespace Covaleski\Helpers;
 
 use Covaleski\Helpers\Enums\FileMode;
+use Covaleski\Helpers\Enums\WriteMode;
 use ErrorException;
 
 /**
@@ -71,6 +72,41 @@ class File
         } else {
             return Error::watch(
                 fn () => stream_get_contents($file, $length, $offset),
+            );
+        }
+    }
+
+    /**
+     * Write the specified contents to a resource or filename.
+     */
+    public static function write(
+        mixed $file,
+        string $data,
+        WriteMode $mode = WriteMode::OVERWRITE,
+        null|int $offset = null,
+        null|int $length = null,
+        mixed $context = null,
+    ): int {
+        if (is_string($file)) {
+            $file = static::open($file, FileMode::WRITE, $context);
+            $result = static::write($file, $data, $mode, $offset, $length);
+            static::close($file);
+            return $result;
+        } else {
+            return Error::watch(
+                function () use ($file, $data, $mode, $offset, $length) {
+                    if ($mode === WriteMode::APPEND) {
+                        fseek($file, 0, SEEK_END);
+                    } elseif ($mode === WriteMode::OVERWRITE) {
+                        if ($offset !== null) {
+                            fseek($file, $offset, SEEK_SET);
+                        }
+                    } elseif ($mode === WriteMode::TRUNCATE) {
+                        ftruncate($file, $offset ?? 0);
+                        fseek($file, 0, SEEK_END);
+                    }
+                    return fwrite($file, $data, $length);
+                }
             );
         }
     }
