@@ -6,8 +6,8 @@ Static methods I like to use in personal projects.
 
 - [ ] Methods:
   - [ ] `File::copy($from, $to)`;
-  - [ ] `File::read($file, $context, $offset, $length)`;
-  - [ ] `File::write($file, $data)`;
+  - [X] `File::read($file, $context, $offset, $length)`;
+  - [X] `File::write($file, $data)`;
 - [ ] Test and upload personal helpers:
   - [ ] `Internet`;
   - [ ] `Json`;
