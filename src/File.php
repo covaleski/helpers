@@ -60,19 +60,18 @@ class File
         int $offset = 0,
         null|int $length = null,
     ): string {
-        return Error::watch(
-            function () use ($file, $context, $offset, $length) {
-                if (is_string($file)) {
-                    return file_get_contents(
-                        filename: $file,
-                        use_include_path: false,
-                        context: $context,
-                        offset: $offset,
-                        length: $length);
-                } else {
-                    return stream_get_contents($file, $length, $offset);
-                }
-            },
-        );
+        if (is_string($file)) {
+            return Error::watch(fn () => file_get_contents(
+                filename: $file,
+                use_include_path: false,
+                context: $context,
+                offset: $offset,
+                length: $length,
+            ));
+        } else {
+            return Error::watch(
+                fn () => stream_get_contents($file, $length, $offset),
+            );
+        }
     }
 }
