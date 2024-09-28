@@ -56,7 +56,7 @@ class File
      */
     public static function read(
         mixed $file,
-        mixed $context,
+        mixed $context = null,
         int $offset = 0,
         null|int $length = null,
     ): string {
